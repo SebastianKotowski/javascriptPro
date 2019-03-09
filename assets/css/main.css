@@ -204,6 +204,10 @@ input, select, textarea {
 
 	/* My */
 
+	.hidden {
+		display: none;
+	}
+
 	#footer .invalid {
 		border: solid 2px red;
 	}
