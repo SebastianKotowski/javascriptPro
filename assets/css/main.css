@@ -216,6 +216,10 @@ input, select, textarea {
 		border: solid 2px green;
 	}
 
+	.no-margin {
+		margin-bottom: 0px;
+	}
+
 	/* Sketchpad */
 
 	#sketchpad {
