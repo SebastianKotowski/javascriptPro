@@ -1,8 +1,15 @@
 (function() {
 
-    if(!window.FileReader) {
+    if(!"draggable" in document.createElement("span") || !window.FileReader) {
         return;
     }
+
+    var dropZone = document.querySelector("#dropZone");
+
+    dropZone.ondragenter = addHover;
+    dropZone.ondragleave = removeHover;
+    dropZone.ondragover = cancelDefault;
+    dropZone.ondrop = handleDrop;
 
     var fileInput= document.querySelector("#fileInput"),
         fileName = document.querySelector("#fileName"),
@@ -15,10 +22,59 @@
         img = document.createElement("img");
         filter1Button = document.querySelector("#filterBtn");
         filter2Button = document.querySelector("#filterBtn2");
+        errorMessage = document.querySelector("#errorMessage");
        
+    function addHover() {
+
+        this.dropZone.classList.add("dragOver");
+
+    }
+
+    function removeHover() {
+
+        this.dropZone.classList.remove("dragOver");
+
+    }
+
+    function cancelDefault(e) {
+
+        e.preventDefault();
+        return false;
+        
+    }
+
+    function handleDrop(e) {
+
+        e.preventDefault();
+        e.stopPropagation();
+
+        var file = e.dataTransfer.files[0];
+
+        if(file.type.match("image.*")) {
+            createImg(file);
+        }
+        else {
+            errorMessage.innerHTML = "You should select image file";
+        } 
+        
+
+        this.removeHover();
+    }   
+
     fileInput.onchange = function() {
-        var file = this.files[0],
-            reader = new FileReader();
+        var file = this.files[0];
+        
+        if(file.type.match("image.*")) {
+            createImg(file);
+        }
+        else {
+            errorMessage.innerHTML = "You should select image file";
+        }
+    }
+
+    function createImg(file) {
+
+        reader = new FileReader();
 
         reader.onload = function() {
             var blobik = new Blob([this.result], {type: file.type});
@@ -36,7 +92,9 @@
         fileName.innerHTML = "Name: " + file.name;
         fileSize.innerHTML = "Size: " + file.size;
         fileType.innerHTML = "Type: " + file.type;
-        fileLastModifiedDate.innerHTML = "Last modified: " + file.lastModifiedDate.toLocaleDateString();       
+        fileLastModifiedDate.innerHTML = "Last modified: " + file.lastModifiedDate.toLocaleDateString(); 
+        errorMessage.innerHTML = "";
+
     }
 
     img.onload = function() {
@@ -76,23 +134,6 @@
             length = canvasData.data.length;
         
         worker.postMessage(canvasData);
-
-        /* for(var j = 0; j < 100; j++) {
-
-            for(var i = 0; i < length; i += 4) {
-
-                var r = 0.025 * canvasData.data[i] + 0.126 * canvasData.data[i+1] + 0.068 * canvasData.data[i+2];
-                var g = 0.099 * canvasData.data[i] + 0.163 * canvasData.data[i+1] + 0.071 * canvasData.data[i+2];
-                var b = 0.056 * canvasData.data[i] + 0.222 * canvasData.data[i+1] + 0.999 * canvasData.data[i+2];
-    
-                canvasData.data[i] = r;
-                canvasData.data[i+1] = g;
-                canvasData.data[i+2] = b;
-            }
-
-        }  */       
-
-        //ctxImage.putImageData(canvasData, 0, 0);
 
     }
 
